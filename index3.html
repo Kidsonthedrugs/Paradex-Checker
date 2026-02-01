@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paradex Reward Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #05070a;
+            color: #f8fafc;
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .input-glow:focus {
+            border-color: #ec4899;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.15);
+            outline: none;
+        }
+        .compare-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .compare-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-6xl w-full flex flex-col gap-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- settings -->
+            <div class="lg:col-span-4 flex flex-col gap-4">
+                <div class="glass-card rounded-[2.5rem] p-8 text-left">
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-extrabold tracking-tight text-white italic text-center lg:text-left uppercase">
+                            paradex <span class="text-pink-500">checker</span>
+                        </h1>
+                        <p class="text-slate-500 text-[10px] uppercase tracking-[0.4em] font-bold mt-1 text-center lg:text-left text-nowrap">reward calculator v2.0</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">select season</label>
+                            <div class="flex gap-2">
+                                <button onclick="setSeason('s2')" id="btn-s2" class="flex-1 py-3 rounded-xl border border-pink-500/50 bg-pink-500/10 text-[10px] font-black uppercase text-white transition-all">season 2</button>
+                                <button onclick="setSeason('s1')" id="btn-s1" class="flex-1 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-[10px] font-black uppercase text-slate-500 transition-all">season 1 & pre</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-pink-400 uppercase tracking-widest mb-2">your points (total xps)</label>
+                            <input type="number" id="userPoints" placeholder="" oninput="calculate()"
+                                class="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl px-5 py-4 text-xl font-bold text-white input-glow transition-all">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">estimated fdv ($ millions)</label>
+                            <div class="relative">
+                                <input type="number" id="estFdv" placeholder="" oninput="calculate()"
+                                    class="w-full bg-slate-900/50 border border-slate-700/50 rounded-2xl px-5 py-4 text-xl font-bold text-white input-glow transition-all">
+                                <span class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 font-bold italic">M</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-800 space-y-3">
+                            <p class="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-tight text-center italic">
+                                supply data: s2 (235.9m xp) | s1/pre (100.1m xp)
+                            </p>
+                            <p class="text-[9px] text-pink-500/70 leading-relaxed uppercase font-bold tracking-tight text-center italic">
+                                allocation: s2 (20%) | s1/pre (5%) of 1b supply
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-8 py-4 flex justify-between items-center bg-pink-500/5 rounded-3xl border border-pink-500/10">
+                    <span class="text-[10px] font-bold text-pink-400/60 uppercase tracking-widest text-nowrap">community tool by dierich</span>
+                    <a href="https://x.com/0xdierich" target="_blank" class="text-white hover:text-pink-400 transition-colors">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- right panel -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                <!-- Result Card -->
+                <div class="glass-card rounded-[2.5rem] p-8 border-pink-500/20 bg-pink-500/5 relative overflow-hidden text-left">
+                    <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                        <div>
+                            <p class="text-pink-400 text-[10px] font-black uppercase tracking-[0.3em] mb-1">estimated reward value</p>
+                            <h2 id="finalValue" class="text-7xl font-black text-white tracking-tighter">$0.00</h2>
+                        </div>
+                        
+                        <div class="flex flex-col gap-6 md:text-right border-t md:border-t-0 md:border-l border-white/5 pt-6 md:pt-0 md:pl-8">
+                            <div>
+                                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">token allocation</p>
+                                <h3 id="tokenAlloc" class="text-2xl font-bold text-slate-100">0 <span class="text-sm text-slate-500 uppercase">tokens</span></h3>
+                            </div>
+                            <div>
+                                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">value per 100 xp</p>
+                                <h3 id="valuePer100Xp" class="text-xl font-bold text-slate-300">$0.00</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -right-20 -top-20 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                    <div class="glass-card rounded-[2.5rem] p-8">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6">market benchmarks</h3>
+                        <div class="space-y-3">
+                            <div class="compare-card p-4 rounded-2xl flex justify-between items-center cursor-pointer" onclick="setFdv(30000)">
+                                <span class="text-sm font-bold text-slate-200 uppercase">hyperliquid</span>
+                                <span class="text-sm font-black text-pink-400">$30.0b</span>
+                            </div>
+                            <div class="compare-card p-4 rounded-2xl flex justify-between items-center cursor-pointer" onclick="setFdv(4800)">
+                                <span class="text-sm font-bold text-slate-200 uppercase">aster</span>
+                                <span class="text-sm font-black text-pink-400">$4.8b</span>
+                            </div>
+                            <div class="compare-card p-4 rounded-2xl flex justify-between items-center cursor-pointer" onclick="setFdv(1700)">
+                                <span class="text-sm font-bold text-slate-200 uppercase">lighter</span>
+                                <span class="text-sm font-black text-pink-400">$1.7b</span>
+                            </div>
+                            <div class="compare-card p-4 rounded-2xl flex justify-between items-center cursor-pointer" onclick="setFdv(270)">
+                                <span class="text-sm font-bold text-slate-200 uppercase">avantis</span>
+                                <span class="text-sm font-black text-pink-400">$270m</span>
+                            </div>
+                            <div class="compare-card p-4 rounded-2xl flex justify-between items-center cursor-pointer" onclick="setFdv(150)">
+                                <span class="text-sm font-bold text-slate-200 uppercase">dydx</span>
+                                <span class="text-sm font-black text-pink-400">$150m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-[2.5rem] p-8">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6">fdv scenarios</h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            <button onclick="setFdv(300)" class="w-full p-4 rounded-2xl border border-slate-700/50 hover:border-pink-500/50 bg-slate-900/40 flex justify-between items-center group transition-all">
+                                <span class="text-xs font-bold text-slate-400 group-hover:text-white uppercase tracking-widest text-nowrap">conservative</span>
+                                <span class="font-black text-white">$300m</span>
+                            </button>
+                            <button onclick="setFdv(500)" class="w-full p-4 rounded-2xl border border-slate-700/50 hover:border-pink-500/50 bg-slate-900/40 flex justify-between items-center group transition-all">
+                                <span class="text-xs font-bold text-slate-400 group-hover:text-white uppercase tracking-widest text-nowrap">moderate</span>
+                                <span class="font-black text-white">$500m</span>
+                            </button>
+                            <button onclick="setFdv(750)" class="w-full p-4 rounded-2xl border border-slate-700/50 hover:border-pink-500/50 bg-slate-900/40 flex justify-between items-center group transition-all">
+                                <span class="text-xs font-bold text-slate-400 group-hover:text-white uppercase tracking-widest text-nowrap">realistic</span>
+                                <span class="font-black text-white">$750m</span>
+                            </button>
+                            <button onclick="setFdv(1500)" class="w-full p-4 rounded-2xl border border-slate-700/50 hover:border-pink-500/50 bg-slate-900/40 flex justify-between items-center group transition-all">
+                                <span class="text-xs font-bold text-slate-400 group-hover:text-white uppercase tracking-widest text-nowrap">optimistic</span>
+                                <span class="font-black text-white">$1.5b</span>
+                            </button>
+                            <button onclick="setFdv(3000)" class="w-full p-4 rounded-2xl border border-slate-700/50 hover:border-pink-500/50 bg-slate-900/40 flex justify-between items-center group transition-all">
+                                <span class="text-xs font-bold text-slate-400 group-hover:text-white uppercase tracking-widest text-nowrap">bullish</span>
+                                <span class="font-black text-white">$3b</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSeason = 's2';
+        const CONFIG = {
+            s2: {
+                totalXp: 235900000,
+                allocationPercent: 0.20
+            },
+            s1: {
+                totalXp: 100100000,
+                allocationPercent: 0.05
+            }
+        };
+
+        function setSeason(s) {
+            currentSeason = s;
+            const btnS2 = document.getElementById('btn-s2');
+            const btnS1 = document.getElementById('btn-s1');
+            
+            if (s === 's2') {
+                btnS2.className = "flex-1 py-3 rounded-xl border border-pink-500/50 bg-pink-500/10 text-[10px] font-black uppercase text-white transition-all";
+                btnS1.className = "flex-1 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-[10px] font-black uppercase text-slate-500 transition-all";
+            } else {
+                btnS1.className = "flex-1 py-3 rounded-xl border border-pink-500/50 bg-pink-500/10 text-[10px] font-black uppercase text-white transition-all";
+                btnS2.className = "flex-1 py-3 rounded-xl border border-slate-700 bg-slate-900/50 text-[10px] font-black uppercase text-slate-500 transition-all";
+            }
+            calculate();
+        }
+
+        function setFdv(millions) {
+            document.getElementById('estFdv').value = millions;
+            calculate();
+        }
+
+        function calculate() {
+            const userPoints = parseFloat(document.getElementById('userPoints').value) || 0;
+            const fdvMillions = parseFloat(document.getElementById('estFdv').value) || 0;
+            
+            const config = CONFIG[currentSeason];
+            const totalTokens = 1000000000;
+            const poolTokens = totalTokens * config.allocationPercent;
+            
+            const userTokenAlloc = (userPoints / config.totalXp) * poolTokens;
+            const userDollarValue = userTokenAlloc * (fdvMillions / 1000);
+            const valuePer100Xp = (100 / config.totalXp) * poolTokens * (fdvMillions / 1000);
+
+            document.getElementById('finalValue').innerText = '$' + userDollarValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('tokenAlloc').innerHTML = Math.floor(userTokenAlloc).toLocaleString() + ' <span class="text-sm text-slate-500 uppercase italic">tokens</span>';
+            document.getElementById('valuePer100Xp').innerText = '$' + valuePer100Xp.toLocaleString(undefined, {minimumFractionDigits: 4, maximumFractionDigits: 4});
+        }
+    </script>
+</body>
+</html>
